@@ -1,14 +1,28 @@
 #!/bin/sh
-# create SRC DST...: start a tee that reads SRC and writes every byte it gets
-# to each DST, in order, until removed. Print its directory. Every path must
-# already exist; the tee makes nothing but itself.
+# create SRC SIDE DST...: copy what SIDE writes into pipe SRC onto the same
+# lanes of every pipe DST, byte for byte, in order, until removed. Print the
+# tee's directory. Every pipe must exist and have the same lane count; the
+# tee makes nothing but itself.
 set -eu
-[ $# -ge 2 ] || { echo "usage: create SRC DST..." >&2; exit 1; }
-for p; do [ -e "$p" ] || { echo "no such path: $p" >&2; exit 1; }; done
-src=$(readlink -f "$1"); shift
+[ $# -ge 3 ] || { echo "usage: create SRC SIDE DST..." >&2; exit 1; }
+src=$1; side=$2; shift 2
+[ "$side" = 0 ] || [ "$side" = 1 ] || { echo "side is 0 or 1" >&2; exit 1; }
+for p in "$src" "$@"; do
+  [ -p "$p/0" ] || { echo "not a pipe: $p" >&2; exit 1; }
+done
+n=$(ls "$src" | grep -c '^[0-9][0-9]*$')
+for p; do
+  [ "$(ls "$p" | grep -c '^[0-9][0-9]*$')" -eq "$n" ] ||
+    { echo "lanes differ: $p" >&2; exit 1; }
+done
 d=$(mktemp -d /tmp/icc-tee-XXXXXXXX)
-printf '%s\n' "$src" > "$d/src"
-for p; do readlink -f "$p"; done > "$d/dst"
-tee -a -- "$@" < "$src" > /dev/null 2>&1 &
-echo $! > "$d/pid"
+src=$(readlink -f "$src")
+{ printf '%s\n' "$src" "$side"; for p; do readlink -f "$p"; done; } > "$d/tee"
+l=$side
+while [ "$l" -lt "$n" ]; do
+  outs=; for p; do outs="$outs '$p/$l'"; done
+  eval "tee -a -- $outs < '$src/$l' > /dev/null 2>&1 &"
+  echo $! >> "$d/pid"
+  l=$((l + 2))
+done
 echo "$d"

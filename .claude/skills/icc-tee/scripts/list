@@ -1,11 +1,14 @@
 #!/bin/sh
-# list: one line per tee, "DIR up|down SRC DST...".
-# Up means the tee still has SRC open to read.
+# list: one line per tee, "DIR up|down SRC SIDE DST...".
+# Up means every lane's copier still has its lane of SRC open to read.
 for d in /tmp/icc-tee-*/; do
   [ -d "$d" ] || continue
   d=${d%/}
-  p=$(cat "$d/pid" 2>/dev/null)
-  s=down
-  [ "$(readlink "/proc/$p/fd/0" 2>/dev/null)" = "$(cat "$d/src")" ] && s=up
-  echo "$d $s $(cat "$d/src" "$d/dst" | paste -sd ' ')"
+  src=$(sed -n 1p "$d/tee"); l=$(sed -n 2p "$d/tee")
+  s=up
+  for p in $(cat "$d/pid" 2>/dev/null); do
+    [ "$(readlink "/proc/$p/fd/0" 2>/dev/null)" = "$src/$l" ] || s=down
+    l=$((l + 2))
+  done
+  echo "$d $s $(paste -sd ' ' < "$d/tee")"
 done

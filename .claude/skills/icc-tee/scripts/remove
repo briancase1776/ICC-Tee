@@ -1,8 +1,8 @@
 #!/bin/sh
 # remove DIR: stop the tee, delete its directory. DIR is what create printed.
-# SRC and every DST are left exactly as they were.
+# The pipes on either end are left exactly as they were.
 set -eu
 d=${1:?usage: remove DIR}
-[ -f "$d/pid" ] && [ -f "$d/src" ] || { echo "not a tee: $d" >&2; exit 1; }
-kill "$(cat "$d/pid")" 2>/dev/null || :
+[ -f "$d/tee" ] && [ -f "$d/pid" ] || { echo "not a tee: $d" >&2; exit 1; }
+kill $(cat "$d/pid") 2>/dev/null || :
 rm -rf "$d"
