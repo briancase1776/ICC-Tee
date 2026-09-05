@@ -1,6 +1,11 @@
 #!/bin/sh
+# .claude/skills/icc-tee/scripts/list
 # list: one line per tee, "DIR up|down SRC SIDE DST...".
 # Up means every lane's copier still has its lane of SRC open to read.
+# Copyright (c) 2026 Brian Case. All rights reserved.
+# AI contributor: Claude (Anthropic)
+#
+# MIT License text omitted for brevity, see LICENSE
 for d in /tmp/icc-tee-*/; do
   [ -d "$d" ] || continue
   d=${d%/}

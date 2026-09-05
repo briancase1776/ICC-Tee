@@ -1,8 +1,13 @@
 #!/bin/sh
+# .claude/skills/icc-tee/scripts/create
 # create SRC SIDE DST...: copy what SIDE writes into pipe SRC onto the same
 # lanes of every pipe DST, byte for byte, in order, until removed. Print the
 # tee's directory. Every pipe must exist and have the same lane count; the
 # tee makes nothing but itself.
+# Copyright (c) 2026 Brian Case. All rights reserved.
+# AI contributor: Claude (Anthropic)
+#
+# MIT License text omitted for brevity, see LICENSE
 set -eu
 [ $# -ge 3 ] || { echo "usage: create SRC SIDE DST..." >&2; exit 1; }
 src=$1; side=$2; shift 2

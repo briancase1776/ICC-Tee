@@ -1,7 +1,12 @@
 #!/bin/sh
+# tests/run.sh
 # Prove the tee: get three pipes, tee side 0 of one into the other two, push
 # a Frames payload bigger than one lane holds, read it back whole from both
 # outlets, then plain bytes on one lane, remove it. The pipes stay up.
+# Copyright (c) 2026 Brian Case. All rights reserved.
+# AI contributor: Claude (Anthropic)
+#
+# MIT License text omitted for brevity, see LICENSE
 set -eu
 cd "$(dirname "$0")/.."
 P=${ICC_PIPES:-../ICC-Pipes}/.claude/skills/icc-pipes/scripts
