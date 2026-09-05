@@ -7,7 +7,7 @@
 # Copyright (c) 2026 Brian Case. All rights reserved.
 # AI contributor: Claude (Anthropic)
 #
-# MIT License text omitted for brevity, see LICENSE
+# MIT License text omitted for brevity, See LICENCE.TXT
 set -eu
 [ $# -ge 3 ] || { echo "usage: create SRC SIDE DST..." >&2; exit 1; }
 src=$1; side=$2; shift 2
