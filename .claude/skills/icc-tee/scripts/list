@@ -1,0 +1,11 @@
+#!/bin/sh
+# list: one line per tee, "DIR up|down SRC DST...".
+# Up means the tee still has SRC open to read.
+for d in /tmp/icc-tee-*/; do
+  [ -d "$d" ] || continue
+  d=${d%/}
+  p=$(cat "$d/pid" 2>/dev/null)
+  s=down
+  [ "$(readlink "/proc/$p/fd/0" 2>/dev/null)" = "$(cat "$d/src")" ] && s=up
+  echo "$d $s $(cat "$d/src" "$d/dst" | paste -sd ' ')"
+done

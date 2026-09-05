@@ -1,0 +1,14 @@
+#!/bin/sh
+# create SRC DST...: start a tee that reads SRC and writes every byte it gets
+# to each DST, in order, until removed. Print its directory. Every path must
+# already exist; the tee makes nothing but itself.
+set -eu
+[ $# -ge 2 ] || { echo "usage: create SRC DST..." >&2; exit 1; }
+for p; do [ -e "$p" ] || { echo "no such path: $p" >&2; exit 1; }; done
+src=$(readlink -f "$1"); shift
+d=$(mktemp -d /tmp/icc-tee-XXXXXXXX)
+printf '%s\n' "$src" > "$d/src"
+for p; do readlink -f "$p"; done > "$d/dst"
+tee -a -- "$@" < "$src" > /dev/null 2>&1 &
+echo $! > "$d/pid"
+echo "$d"
